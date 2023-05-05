@@ -10,13 +10,19 @@ import (
 func main() {
 	enc := json.NewEncoder(os.Stdout)
 
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		u, err := url.Parse(scanner.Text())
-		orDie(err, enc)
-		enc.Encode(u)
+	var uri string
+	if len(os.Args[1]) > 0 {
+		uri = os.Args[1]
+	} else {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			uri += scanner.Text()
+		}
+		orDie(scanner.Err(), enc)
 	}
-	orDie(scanner.Err(), enc)
+	u, err := url.Parse(uri)
+	orDie(err, enc)
+	enc.Encode(u)
 }
 
 func orDie(err error, enc *json.Encoder) {
